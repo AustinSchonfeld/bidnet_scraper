@@ -37,8 +37,22 @@ req = urllib.request.Request(
     }
     )
 
+class Client(QWebPage):
+
+    def __init__(self, url):
+        self.app = QApplication(sys.argv)
+        QWebPage.__init__(self)
+        self.loadFinished.connect(self.on_page_load)
+        self.mainFrame().load(QUrl(url))
+        self.app.exec_()
+        
+    def on_page_load(self):
+        self.app.quit()
+
 #find the number of pages available to search
-current_page = urllib.request.urlopen(req)
-html = current_page.read().decode("utf-8", errors = 'ignore')
-soup = bs(html, 'html.parser')
-print(soup)
+
+client_response = Client(url)
+source = client_response.mainFrame().toHtml()
+soup = bs.BeautifulSoup(source, 'lxml')
+test = soup.find('outline', class_ = 'mets-pagination-number')
+print(test)
